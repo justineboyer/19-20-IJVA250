@@ -2,6 +2,7 @@ package com.example.demo.entity;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.Set;
 
 /**
@@ -22,6 +23,9 @@ public class Client {
 
     @Column
     private LocalDate dateNaissance;
+
+    @OneToMany(mappedBy="client")
+    private Set<Facture> factures;
 
     public Long getId() {
         return id;
@@ -55,4 +59,15 @@ public class Client {
         this.dateNaissance = dateNaissance;
     }
 
+    public Set<Facture> getFactures() {
+        return factures;
+    }
+
+    public void setFactures(Set<Facture> factures) {
+        this.factures = factures;
+    }
+
+    public int getAge() {
+        return Period.between(dateNaissance, LocalDate.now()).getYears();
+    }
 }

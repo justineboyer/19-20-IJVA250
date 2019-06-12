@@ -2,9 +2,11 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.Client;
 import com.example.demo.entity.Facture;
+import com.example.demo.entity.LigneFacture;
 import com.example.demo.service.ClientService;
 import com.example.demo.service.ExportService;
 import com.example.demo.service.FactureService;
+import com.itextpdf.text.DocumentException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -85,33 +87,46 @@ public class ExportController {
 
     @GetMapping("/clients/{id}/factures/xlsx")
     public void factureXLSXByClient(@PathVariable("id") Long clientId, HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        Client client = clientService.findById(clientId);
+
         response.setContentType("text/csv");
-        response.setHeader("Content-Disposition", "attachment; filename=\"factures-client-" + clientId + ".xlsx\"");
+        response.setHeader("Content-Disposition", "attachment; filename=\"factures_" + client.getNom().replaceAll("[^A-Za-z0-9]","") + ".xlsx\"");
         List<Facture> factures = factureService.findFacturesClient(clientId);
 
         Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Facture");
-        Row headerRow = sheet.createRow(0);
 
-        Cell cellId = headerRow.createCell(0);
-        cellId.setCellValue("Id");
+        exportService.classeurClient(workbook, client);
 
-        Cell cellTotal = headerRow.createCell(1);
-        cellTotal.setCellValue("Prix Total");
-
-        int iRow = 1;
-        for (Facture facture : factures) {
-            Row row = sheet.createRow(iRow);
-
-            Cell id = row.createCell(0);
-            id.setCellValue(facture.getId());
-
-            Cell prenom = row.createCell(1);
-            prenom.setCellValue(facture.getTotal());
-
-            iRow = iRow + 1;
-        }
         workbook.write(response.getOutputStream());
         workbook.close();
+    }
+
+    @GetMapping("/factures/xlsx")
+    public void facturesXLSX(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=\"factures.xlsx\"");
+        List<Client> clients = clientService.findAllClients();
+
+        Workbook workbook = new XSSFWorkbook();
+        for (Client client : clients) {
+            exportService.classeurClient(workbook, client);
+        }
+
+
+        workbook.write(response.getOutputStream());
+        workbook.close();
+    }
+
+    @GetMapping("/factures/{id}/pdf")
+    public void facturePdf(
+            @PathVariable("id") Long idFacture,
+            HttpServletResponse response
+    ) throws IOException, DocumentException {
+        response.setContentType("application/pdf");
+        response.setHeader(
+                "Content-Disposition",
+                "attachment; filename=\"facture" + idFacture + ".pdf\"");
+        exportService.exportPDF(idFacture, response.getOutputStream());
     }
 }

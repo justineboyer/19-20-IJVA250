@@ -19,4 +19,14 @@ public class ClientServiceBidonImpl implements ClientService {
 
         return list;
     }
+
+    @Override
+    public Client findById(Long id) {
+        Client client = new Client();
+        client.setNom("PETRILLO");
+        client.setPrenom("Alexandre");
+        client.setDateNaissance(LocalDate.now());
+
+        return client;
+    }
 }

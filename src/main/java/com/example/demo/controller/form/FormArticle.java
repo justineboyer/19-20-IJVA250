@@ -1,34 +1,9 @@
-package com.example.demo.entity;
+package com.example.demo.controller.form;
 
-import javax.persistence.*;
-import java.time.LocalDate;
-
-/**
- * Created by Alexandre on 09/04/2018.
- */
-@Entity
-public class Article {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
-    @Column
+public class FormArticle {
     private String libelle;
-
-    @Column
     private double prix;
-
-    @Column
     private int quantite;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getLibelle() {
         return libelle;
